@@ -18,15 +18,21 @@ def imprimir_labirinto(matriz):
 
 
 def inserir_wumpus(matriz):
-    posicao_wumpus = random.randint(0, len(matriz)-1), random.randint(0, len(matriz[0])-1)
+    posicao_wumpus = random.randint(1, len(matriz)-1), random.randint(1, len(matriz[0])-1)
     return posicao_wumpus
 
 def inserir_ouro(matriz, posicao_wumpus):
-    posicao_ouro =  random.randint(0, len(matriz)-1), random.randint(0, len(matriz[0])-1)
+    posicao_ouro =  random.randint(1, len(matriz)-1), random.randint(1, len(matriz[0])-1)
     while posicao_ouro == posicao_wumpus:
-        posicao_ouro = random.randint(0, len(matriz)-1), random.randint(0, len(matriz[0])-1)
+        posicao_ouro = random.randint(1, len(matriz)-1), random.randint(1, len(matriz[0])-1)
     return posicao_ouro
 
+
+def inserir_pocos(matriz):
+    pass
+
+def inserir_percepcao(matriz):
+    pass
 
 tm_matriz = int(input("Qual o tamanho da matriz?  "))
 matriz = criar_labirinto(tm_matriz, tm_matriz, "?")
