@@ -44,7 +44,6 @@ def inserir_pocos(matriz, posicao_wumpus, posicao_ouro):
 
 def inserir_percepcao(matriz):
     tamanho_matriz = len(matriz)
-    percepcoes = [[[] for _ in range(tamanho_matriz)] for _ in range(tamanho_matriz)]
 
     def adjacentes(x, y):
         adj = []
@@ -66,6 +65,8 @@ def inserir_percepcao(matriz):
                         matriz[x][y] = "OF"
                     elif(matriz[x][y] == "P"):
                         matriz[x][y] = "P"
+                    elif (matriz[x][y] == "B"):
+                        matriz[x][y] = "FB"
                     else:
                         matriz[x][y] = "F"
             elif matriz[i][j] == "P":
@@ -80,19 +81,19 @@ def inserir_percepcao(matriz):
                         matriz[x][y] = "P"
                     else:
                         matriz[x][y] = "B"
-    return percepcoes
+    return matriz
 
 def movimento_jogador(matriz, movimento):
     pass
 
 
-def play_game(matriz):
+def play(matriz):
     # inserir jogador
     matriz[0][0] = "J"
     while True:
         print("Labirinto atual ...")
         print(imprimir_labirinto_jogador(matriz))
-        movimento = input("Para onde desja mover (cima, baixo, esquerda, direita): ").lower()
+        movimento = input("Para onde deseja mover (cima, baixo, esquerda, direita): ").lower()
         movimento_jogador(matriz, movimento)
 
 
