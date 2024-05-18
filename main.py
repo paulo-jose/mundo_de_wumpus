@@ -83,18 +83,73 @@ def inserir_percepcao(matriz):
                         matriz[x][y] = "B"
     return matriz
 
-def movimento_jogador(matriz, movimento):
-    pass
+def movimento_automatico(matriz):
+    direcoes = [(-1, 0), (1, 0), (0, -1), (0, 1)]  # movimento do agente cima, baixo, esquerda, direita
+    visitado = set()
+    jogo_terminado = False
+
+    def buscar_caminho(x, y):
+        nonlocal jogo_terminado
+        if jogo_terminado:
+            return False
+        if (x, y) in visitado:
+            return False
+        visitado.add((x, y))
+        
+        # Verificando o que tem na posição atual
+        if matriz[x][y] == "W":
+            print("Agente foi devorado pelo Wumpus! Fim de jogo.")
+            jogo_terminado = True
+            return False
+        elif matriz[x][y] == "P":
+            print("Agente caiu em um poço! Fim de jogo.")
+            jogo_terminado = True
+            return False
+        elif matriz[x][y] == "O":
+            print("Agente encontrou o ouro! Você ganhou!")
+            jogo_terminado = True
+            return True
+        
+        # Marcando as posições do agente na matriz
+        matriz[x][y] = "J"
+        imprimir_labirinto(matriz)
+        print()
+        
+        # Explorando as direções possíveis
+        for dx, dy in direcoes:
+            nx, ny = x + dx, y + dy
+            if 0 <= nx < len(matriz) and 0 <= ny < len(matriz[0]):
+                if buscar_caminho(nx, ny):
+                    return True
+        
+        # Se não encontrou, desmarca a posição do agente (backtracking)
+        matriz[x][y] = " "
+        return False
+
+    return buscar_caminho(0, 0)
+
+
+# def movimento_jogador(matriz, movimento): // Novo teste para movimento implementado
+#     pass
 
 
 def play(matriz):
     # inserir jogador
     matriz[0][0] = "J"
-    while True:
-        print("Labirinto atual ...")
-        print(imprimir_labirinto_jogador(matriz))
-        movimento = input("Para onde deseja mover (cima, baixo, esquerda, direita): ").lower()
-        movimento_jogador(matriz, movimento)
+    sucesso = movimento_automatico(matriz)
+    if sucesso:
+        print("Parabéns, o ouro foi encontrado!")
+    else:
+        print("Infelizmente, o ouro não foi encontrado. Tente novamente!")
+    
+    
+    # inserindo novo código para movimento, preciso validar se o movimento é valido
+
+    # while True:
+    #     print("Labirinto atual ...")
+    #     print(imprimir_labirinto_jogador(matriz))
+    #     movimento = input("Para onde deseja mover (cima, baixo, esquerda, direita): ").lower()
+    #     movimento_jogador(matriz, movimento)
 
 
 
@@ -109,9 +164,14 @@ matriz[posicao_ouro[0]][posicao_ouro[1]] = "O"
 matriz[posicao_wumpus[0]][posicao_wumpus[1]] = 'W'
 inserir_pocos(matriz, posicao_wumpus, posicao_ouro)
 print()
-imprimir_labirinto(matriz)
+
+# imprimir_labirinto(matriz) Estou removendo por bug de duplicação de matriz no código! 
+
 print()
 inserir_percepcao(matriz)
 print()
 imprimir_labirinto(matriz)
+
+#chamando o a função de movimento automático do agente e inicio de jogo
+play(matriz)
 
