@@ -16,12 +16,6 @@ def imprimir_labirinto(matriz):
        for j in range(len(matriz[0])):
            print(matriz[i][j], end = " ")
 
-def imprimir_labirinto_jogador(matriz):
-    for i in range(len(matriz)):
-        print("")
-        for j in range(len(matriz[0])):
-            print(matriz[i][j], end=" ")
-
 
 def inserir_wumpus(matriz):
     posicao_wumpus = random.randint(0, len(matriz)-1), random.randint(0, len(matriz[0])-1)
@@ -99,6 +93,52 @@ def inserir_percepcao(matriz):
                         matriz[x][y] = "B"
     return matriz
 
+
+def movimento_automatico(matriz):
+    direcoes = [(-1, 0), (1, 0), (0, -1), (0, 1)]  # movimento do agente cima, baixo, esquerda, direita
+    visitado = set()
+    jogo_terminado = False
+
+    def buscar_caminho(x, y):
+        nonlocal jogo_terminado
+        if jogo_terminado:
+            return False
+        if (x, y) in visitado:
+            return False
+        visitado.add((x, y))
+
+        # Verificando o que tem na posição atual
+        if matriz[x][y] == "W":
+            print("Agente foi devorado pelo Wumpus! Fim de jogo.")
+            jogo_terminado = True
+            return False
+        elif matriz[x][y] == "P":
+            print("Agente caiu em um poço! Fim de jogo.")
+            jogo_terminado = True
+            return False
+        elif matriz[x][y] == "O":
+            print("Agente encontrou o ouro! Você ganhou!")
+            jogo_terminado = True
+            return True
+
+        # Marcando as posições do agente na matriz
+        matriz[x][y] = "J"
+        imprimir_labirinto(matriz)
+        print()
+
+        # Explorando as direções possíveis
+        for dx, dy in direcoes:
+            nx, ny = x + dx, y + dy
+            if 0 <= nx < len(matriz) and 0 <= ny < len(matriz[0]):
+                if buscar_caminho(nx, ny):
+                    return True
+
+        # Se não encontrou, desmarca a posição do agente (backtracking)
+        matriz[x][y] = " "
+        return False
+
+    return buscar_caminho(0, 0)
+
 def movimento_jogador(campo_jogador, movimento):
     posicao_jogador_x, posicao_jogador_y = buscar_jogador(campo_jogador)
     tm_matriz = len(campo_jogador)
@@ -143,7 +183,7 @@ def verificar_percepcao(matriz, x, y):
                 return ("Você foi devorado pelo Wumpus, fim de Jogo! :(")
 
 
-def play(matriz):
+def play_jogador(matriz):
     # inserir jogador
     campo_jogador = criar_labirinto(len(matriz), len(matriz), "?")
     campo_jogador[0][0] = "J"
@@ -167,7 +207,14 @@ def play(matriz):
         movimento_jogador(campo_jogador, movimento)
 
 
-
+def play_agente(matriz):
+    # inserir jogador
+    matriz[0][0] = "J"
+    sucesso = movimento_automatico(matriz)
+    if sucesso:
+        print("Parabéns, o ouro foi encontrado!")
+    else:
+        print("Infelizmente, o ouro não foi encontrado. Tente novamente!")
 
 
 
@@ -186,4 +233,4 @@ print()
 inserir_percepcao(matriz)
 print()
 imprimir_labirinto(matriz)
-play(matriz)
+play_agente(matriz)
