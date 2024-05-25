@@ -1,4 +1,5 @@
 import random
+import Agente
 
 def criar_labirinto(n_linhas, n_colunas, valor):
     if n_linhas > 0 and n_colunas > 0:
