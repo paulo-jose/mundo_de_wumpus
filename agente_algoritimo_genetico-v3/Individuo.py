@@ -9,14 +9,18 @@ class Individuo:
         self.pontuacao = 0
         self.flecha = 0
         self.wumpus_morto = False
+        self.ouro = False
         self.vencedor = False
         self.perdedor = False
+        self.campo = None
+
 
     def fitness(self, labirinto):
 
         x, y = labirinto.encontrar_agente()
+
         campo = copy.deepcopy(labirinto.labirinto)
-        ouro = False
+        auxgenoma = copy.deepcopy(self.genoma)
         escape = False
         self.wumpus_morto = False
         self.flecha = 1
@@ -24,7 +28,7 @@ class Individuo:
         posicao = 0
 
         for direcao in self.genoma:
-            #verificar a percepeção de vendor
+            #verificar a percepeção de fendor
             if "F" in campo[x][y] and self.wumpus_morto == False and self.flecha > 0:
                 # escolhe a direção da flecha
                 if x == 0 and y == 0:
@@ -48,38 +52,38 @@ class Individuo:
                 if alvo == 'N' and x > len(campo) - 1 and self.flecha > 0:
                     if campo[x + 1][y] == 'W':
                         self.wumpus_morto = True
-                        self.genoma.insert(count, "ATN")
-                        self.pontuacao += 1000
+                        auxgenoma.insert(count, "ATN")
+                        self.pontuacao += 900
                         campo[x + 1][y] = 'Wm'
                     else:
-                        self.genoma.insert(count, "ATN")
+                        auxgenoma.insert(count, "ATN")
                         self.pontuacao -= 10
                 elif alvo == 'S':
                     if campo[x - 1][y] == 'W':
                         self.wumpus_morto = True
-                        self.genoma.insert(count, "ATS")
-                        self.pontuacao += 1000
+                        auxgenoma.insert(count, "ATS")
+                        self.pontuacao += 900
                         campo[x - 1][y] = 'Wm'
                     else:
-                        self.genoma.insert(count, "ATS")
+                        auxgenoma.insert(count, "ATS")
                         self.pontuacao -= 10
                 elif alvo == 'O' and y > len(campo) - 1:
                     if campo[x][y + 1] == 'W':
                         self.wumpus_morto = True
-                        self.genoma.insert(count, "ATO")
-                        self.pontuacao += 1000
+                        auxgenoma.insert(count, "ATO")
+                        self.pontuacao += 900
                         campo[x][y + 1] = 'Wm'
                     else:
-                        self.genoma.insert(count, "ATO")
+                        auxgenoma.insert(count, "ATO")
                         self.pontuacao -= 10
                 elif alvo == 'L':
                     if campo[x][y - 1] == 'W':
-                        self.genoma.insert(count, "ATL")
                         self.wumpus_morto = True
+                        auxgenoma.insert(count, "ATL")
                         campo[x][y - 1] = 'Wm'
-                        self.pontuacao += 1000
+                        self.pontuacao += 900
                     else:
-                        self.genoma.insert(count, "ATL")
+                        auxgenoma.insert(count, "ATL")
                         self.pontuacao -= 10
 
                 self.flecha = 0
@@ -88,43 +92,51 @@ class Individuo:
 
             if direcao == 'S' and x > 0:
                 x -= 1
-                self.pontuacao += 1
+                self.pontuacao -= 1
+
             elif direcao == 'N' and x < len(campo) - 1:
                 x += 1
-                self.pontuacao += 1
+                self.pontuacao -= 1
+
             elif direcao == 'L' and y > 0:
                 y -= 1
-                self.pontuacao += 1
+                self.pontuacao -= 1
+
             elif direcao == 'O' and y < len(campo) - 1:
                 y += 1
-                self.pontuacao += 1
+                self.pontuacao -= 1
+
 
             # penalidade por mover fora do mapa
             elif direcao == 'S' and x < 0:
-                self.pontuacao -= 1
+                self.pontuacao -= 2
             elif direcao == 'N' and x > len(campo) - 1:
-                self.pontuacao -= 1
+                self.pontuacao -= 2
             elif direcao == 'L' and y < 0:
-                self.pontuacao -= 1
+                self.pontuacao -= 2
             elif direcao == 'O' and y > len(campo) - 1:
-                self.pontuacao -= 1
+                self.pontuacao -= 2
 
-            if ("O" in campo[x][y]) and ouro == False:
+            if ("O" in campo[x][y]) and self.ouro == False:
                 self.pontuacao += 1000  # encontrou o ouro
-                ouro = True
+                self.ouro = True
 
-            elif campo[x][y] == "W" or campo[x][y] == "P":
+            elif campo[x][y] == "W" or "P" in campo[x][y]:
                 self.pontuacao -= 1000  # caiu no poco ou devorado pelo wumpus
                 self.perdedor = True
+                break
 
-            elif (x == 0 and y == 0) and ouro:
-                self.pontuacao += 100
+            elif (x == 0 and y == 0) and self.ouro:
+                self.pontuacao += 1000
                 self.vencedor = True
                 break
 
+            if self.perdedor:
+                break
+
             count +=1
-
-
+        self.genoma = auxgenoma
+        self.campo = campo
 
 
 

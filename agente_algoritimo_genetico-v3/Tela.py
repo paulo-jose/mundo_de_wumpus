@@ -2,8 +2,8 @@ import time
 
 import pygame
 import numpy as np
+import sys
 import random
-
 
 class Tela:
     def __init__(self, linhas, colunas):
@@ -25,7 +25,6 @@ class Tela:
 
 
 # Função para inicializar o tabuleiro do jogo
-
     def inicializar_tabuleiro(self, labirinto):
         tabuleiro = np.zeros((self.linhas, self.colunas), dtype=int)
         pocos_pos = []
@@ -46,7 +45,6 @@ class Tela:
         tabuleiro[wumpus_pos] = 3
         for poco in pocos_pos:
             tabuleiro[poco] = 4
-
 
         return tabuleiro, jogador_pos, ouro_pos, wumpus_pos, pocos_pos
 
@@ -81,7 +79,6 @@ class Tela:
 
 
 # Função principal
-
     def jogar(self, labirinto, individuo):
         tabuleiro, jogador_pos, ouro_pos, wumpus_pos, poços_pos = self.inicializar_tabuleiro(labirinto)
         rodando = True
@@ -89,12 +86,12 @@ class Tela:
         perdeu = False
 
         # Carregar sprites
-        sprite_agente = pygame.image.load("AGv3/sprites/agente3.gif")
-        sprite_ouro = pygame.image.load("AGv3/sprites/ouro.png")
-        sprite_wumpus = pygame.image.load("AGv3/sprites/wumpus.gif")
-        sprite_wumpus_morto = pygame.image.load("AGv3/sprites/wumpus_morto.png")
-        sprite_mumia = pygame.image.load("AGv3/sprites/mumia.png")
-        sprite_vencedor = pygame.image.load("AGv3/sprites/vencedo.png")
+        sprite_agente = pygame.image.load("G:/Meu Drive/Mestrado/2024.1/IA/mundo_de_wumpus/agente_algoritimo_genetico-v3/sprites/agente3.gif")
+        sprite_ouro = pygame.image.load("G:/Meu Drive/Mestrado/2024.1/IA/mundo_de_wumpus/agente_algoritimo_genetico-v3/sprites/ouro.png")
+        sprite_wumpus = pygame.image.load('G:/Meu Drive/Mestrado/2024.1/IA/mundo_de_wumpus/agente_algoritimo_genetico-v3/sprites/wumpus.gif')
+        sprite_wumpus_morto = pygame.image.load('G:/Meu Drive/Mestrado/2024.1/IA/mundo_de_wumpus/agente_algoritimo_genetico-v3/sprites/wumpus_morto.png')
+        sprite_mumia = pygame.image.load('G:/Meu Drive/Mestrado/2024.1/IA/mundo_de_wumpus/agente_algoritimo_genetico-v3/sprites/mumia.png')
+        sprite_vencedor = pygame.image.load('G:/Meu Drive/Mestrado/2024.1/IA/mundo_de_wumpus/agente_algoritimo_genetico-v3/sprites/vencedo.png')
         #sprite_poco = pygame.image.load("poco.png")
 
         sprite_agente = pygame.transform.scale(sprite_agente, (self.tamanho_celula, self.tamanho_celula))
@@ -105,12 +102,11 @@ class Tela:
         sprite_vencedor = pygame.transform.scale(sprite_vencedor, (self.tamanho_celula, self.tamanho_celula))
         #sprite_poco = pygame.transform.scale(sprite_poco, (tamanho_celula, tamanho_celula))
 
-
         count = 0
         ouro = False
         wumpus_morto = False
-        while rodando:
 
+        while rodando:
             for event in self.pygame.event.get():
                 if event.type == self.pygame.QUIT:
                     rodando = False
@@ -127,15 +123,19 @@ class Tela:
                 elif individuo.genoma[count] == 'ATN' and wumpus_morto == False:
                     if wumpus_pos == (jogador_pos[0]+1, jogador_pos[1]):
                         wumpus_morto = True
+                        print(jogador_pos)
                 elif individuo.genoma[count] == 'ATS' and wumpus_morto == False:
                     if wumpus_pos == (jogador_pos[0]-1, jogador_pos[1]):
                         wumpus_morto = True
+                        print(jogador_pos)
                 elif individuo.genoma[count] == 'ATO' and wumpus_morto == False:
                     if wumpus_pos == (jogador_pos[0], jogador_pos[1]+1):
                         wumpus_morto = True
+                        print(jogador_pos)
                 elif individuo.genoma[count] == 'ATL' and wumpus_morto == False:
                     if wumpus_pos == (jogador_pos[0], jogador_pos[1]-1):
                         wumpus_morto = True
+                        print(jogador_pos)
                 else:
                     nova_pos = jogador_pos
             if nova_pos != jogador_pos:
@@ -147,13 +147,17 @@ class Tela:
                 elif jogador_pos == (0,0) and ouro == True:
                     venceu = True
                     count = len(individuo.genoma)
-                elif (jogador_pos == wumpus_pos or jogador_pos in poços_pos) and wumpus_morto == False:
+                elif jogador_pos in poços_pos:
+                    perdeu = True
+                    count = len(individuo.genoma)
+                elif jogador_pos == wumpus_pos  and wumpus_morto == False:
                     perdeu = True
                     count = len(individuo.genoma)
             elif wumpus_morto:
                 tabuleiro[wumpus_pos] = 5
 
             self.janela.fill(self.branco)
+
             if perdeu:
                 self.desenhar_tabuleiro(tabuleiro, sprite_mumia, sprite_ouro, sprite_wumpus)
             elif venceu and wumpus_morto:
@@ -183,4 +187,5 @@ class Tela:
             count += 1
 
         self.pygame.quit()
+        sys.exit()
 

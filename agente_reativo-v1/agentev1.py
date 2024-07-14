@@ -80,7 +80,7 @@ class Agente:
             print("O agente foi devorado pelo Wumpus! Fim de jogo")
             exit()
         elif "W" in self.mundo.matriz[pos_x][pos_y] and not self.mundo.wumpus.esta_vivo():
-            print ("O agente encontrou o Wumpus morto!") #Mensagem de teste para verificar o código!
+            print("O agente encontrou o Wumpus morto!") #Mensagem de teste para verificar o código!
             pass
         if "P" in self.mundo.matriz[pos_x][pos_y]:
             print("O agente caiu em um Poço! Fim de jogo")

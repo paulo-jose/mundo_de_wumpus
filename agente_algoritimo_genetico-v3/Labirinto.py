@@ -6,6 +6,7 @@ class Labirinto:
     def __init__(self):
         self.tamanho = 0
         self.labirinto = None
+        self.labirinto_inicial = None
 
     def criar_labirinto(self, tamanho):
         self.tamanho = tamanho
@@ -20,16 +21,12 @@ class Labirinto:
         else:
             return "Tamanho do Labirinto tem que ser maior que 0"
 
-    # def imprimir_labirinto(self):
-    #     for i in range(len(self.labirinto)):
-    #         print("")
-    #         for j in range(len(self.labirinto[0])):
-    #             print(self.labirinto[i][j], end=" ")
+
+
 
 
     def inserir_elementos(self):
         #inserir Agente
-
 
         #inserir Wumpus
         posicao_wumpus = random.randint(0, len(self.labirinto) - 1), random.randint(0, len(self.labirinto[0]) - 1)
@@ -89,6 +86,8 @@ class Labirinto:
                             self.labirinto[x][y] = "FB"
                         elif (self.labirinto[x][y] == "O"):
                             self.labirinto[x][y] = "OB"
+                        elif (self.labirinto[x][y] == "OB"):
+                            self.labirinto[x][y] = "OB"
                         elif (self.labirinto[x][y] == "OF"):
                             self.labirinto[x][y] = "OFB"
                         elif (self.labirinto[x][y] == "W"):
@@ -102,10 +101,7 @@ class Labirinto:
     def executar_genoma(self, genoma):
         x, y = self.encontrar_agente()
 
-        ouro = False
-        posicao_inicial = False
         print(f"Executar genoma...: {genoma} ")
-
 
         for direcao in genoma:
             if direcao == 'S' and x > 0:
@@ -198,6 +194,7 @@ class Labirinto:
             self.labirinto[0][0] = "A"
         else:
             self.labirinto[0][0] += "A"
+        self.labirinto_inicial = self.labirinto
 
     def encontrar_agente(self):
         for i in range(len(self.labirinto)):
