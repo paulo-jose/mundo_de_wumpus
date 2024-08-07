@@ -17,10 +17,10 @@ class Populacao:
         while len(self.individuos) < self.tm_populacao:
             individuo = Individuo(self.criar_genoma())
             individuo.fitness(labirinto)
-            # if individuo.pontuacao >= 0:
-            individuo.id = cout
-            individuo.geracao = 1
-            self.individuos.append(individuo)
+            if individuo.pontuacao >= 0:
+                individuo.id = cout
+                individuo.geracao = 1
+                self.individuos.append(individuo)
             cout += 1
         return self.individuos
 

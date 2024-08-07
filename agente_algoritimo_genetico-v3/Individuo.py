@@ -8,12 +8,12 @@ class Individuo:
         self.genoma = genoma
         self.pontuacao = 0
         self.flecha = 0
+        self.passos = 0
         self.wumpus_morto = False
         self.ouro = False
         self.vencedor = False
         self.perdedor = False
         self.campo = None
-
 
     def fitness(self, labirinto):
 
@@ -106,7 +106,6 @@ class Individuo:
                 y += 1
                 self.pontuacao -= 1
 
-
             # penalidade por mover fora do mapa
             elif direcao == 'S' and x < 0:
                 self.pontuacao -= 2
@@ -135,6 +134,7 @@ class Individuo:
                 break
 
             count +=1
+            self.passos = count
         self.genoma = auxgenoma
         self.campo = campo
 

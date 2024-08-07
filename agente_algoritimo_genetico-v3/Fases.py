@@ -58,7 +58,6 @@ class Fases:
         return filho1, filho2
 
 
-
     @staticmethod
     def mutacao(genoma, TX_MUTACAO, DIRECAO):
         for i in range(len(genoma)):

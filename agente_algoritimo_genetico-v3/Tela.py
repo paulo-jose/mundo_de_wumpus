@@ -187,5 +187,5 @@ class Tela:
             count += 1
 
         self.pygame.quit()
-        sys.exit()
+
 

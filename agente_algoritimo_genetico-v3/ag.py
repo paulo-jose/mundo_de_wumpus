@@ -50,7 +50,7 @@ while True:
         pai1, pai2 = Fases.selecao_pares(populacao, None)
         if cruzamento < tx_cruzamento:
             #filho1, filho2 = Fases.cruzamento(pai1, pai2, TM_MXGENOMA, 0)
-            filho1, filho2 = Fases.crossover(pai1, pai2, 3, TM_MXGENOMA,  geracao)
+            filho1, filho2 = Fases.crossover(pai1, pai2, 3, len(pai1.genoma),  geracao)
             nova_populacao.add_individuos(Fases.mutacao(filho1.genoma, TX_MUTACAO, DIRECAO), filho1.id, filho1.geracao)
             nova_populacao.add_individuos(Fases.mutacao(filho2.genoma, TX_MUTACAO, DIRECAO), filho2.id, filho2.geracao)
         else:
@@ -69,6 +69,7 @@ while True:
         print("Geracao: ", i.geracao)
         print("Genoma: ", i.genoma)
         print("Pontuação: ", i.pontuacao)
+        print()
 
 
     nova_populacao.individuos.sort(key=lambda individuo: individuo.pontuacao)
@@ -101,6 +102,7 @@ print("Executar genoma:", melhor_individuo.genoma)
 print("Pontuação:", melhor_individuo.pontuacao)
 print("Wumpus Morto:", melhor_individuo.wumpus_morto)
 print("Ouro:", melhor_individuo.ouro)
+print("Quantidade de Passos:", melhor_individuo.passos)
 
 # labirinto.executar_genoma(melhor_individuo.genoma)
 if melhor_individuo.vencedor:
