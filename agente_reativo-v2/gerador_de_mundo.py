@@ -70,7 +70,7 @@ class Mundo:
                     self.matriz[adj[0]][adj[1]] += tipo_de_item
 
     def inserir_pocos(self):
-        numero_pocos = int((self.tamanho_linhas * self.tamanho_colunas) * 0.20)
+        numero_pocos = int((self.tamanho_linhas * self.tamanho_colunas) * 0.15)
         for _ in range(numero_pocos):
             self.inserir_elemento("P")
 
@@ -143,5 +143,4 @@ class Mundo:
                 nova_linha.append(elemento_formatado)
             print(" ".join(nova_linha))
         print("__________________________")
-        time.sleep(1)
         os.system('clear')
