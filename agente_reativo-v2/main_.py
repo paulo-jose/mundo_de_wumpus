@@ -6,6 +6,7 @@ from pontuacao import Pontuacao
 
 
 pontuacao_geracoes = []
+qnt_mortes_wumpus = []
 
 for i in range(20):
 
@@ -27,12 +28,18 @@ for i in range(20):
     agente.sensor()
 
     while agente.vivo:
+        agente.hunt_wumpus()
         agente.mover()
         if agente.ouro_encontrado and agente.posicao_atual == (0, 0):
             break
     
     pontuacao_geracoes.append(pontuacao.pontos)
+    qnt_mortes_wumpus.append(pontuacao.qnt_mortes_wumpus)
 
+soma = 0
 for i in pontuacao_geracoes:
+    soma += i
     print(i)
 
+print(soma/50)
+print('mortes wumpus',qnt_mortes_wumpus)

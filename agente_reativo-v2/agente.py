@@ -7,7 +7,7 @@ class Agente:
         self.caderno = caderno
         self.pontuacao = pontuacao
         self.vivo = True
-        self.ultima_posicao = (0,0)
+        # self.ultima_posicao = (0,0)
         self.posicao_atual = (0,0)
         self.valor_original = "0"
         self.ouro_encontrado = False
@@ -23,14 +23,17 @@ class Agente:
             if self.ouro_encontrado and self.posicao_atual == (0, 0): # REMENDO KKKKKKKK
                 print("Agente voltou para a posição inicial com o ouro!")
                 exit()
+                
 
             px, py = self.posicao_atual #Guarda a posição atual do agente
 
-            if "W" in self.mundo.matriz[px][py]:
+            if "W" in self.mundo.matriz[px][py] and self.mundo.wumpus.vivo == True:
                 print("O agente foi morto pelo Wumpus!")
                 self.pontuacao.morreu_wumpus_poco()
                 self.vivo = False
                 return
+            elif "W" in self.mundo.matriz[px][py] and self.mundo.wumpus.vivo == False:
+                print("O agente encontrou wumpus morto!")
             if "P" in self.mundo.matriz[px][py]:
                 print("O agente caiu em um poço!")
                 self.pontuacao.morreu_wumpus_poco()
@@ -96,17 +99,18 @@ class Agente:
         pos_perigo = []
         pos_perigo_selecionada = (0, 0)
         menor_prob = 1
-        pos_escolhida = self.explorar_pos_seguras()
 
-        if pos_escolhida:
+        pos_escolhida = self.explorar_pos_seguras().copy()
+
+        if len(pos_escolhida) > 0:
             pos_escolhida = random.choice(pos_escolhida)
 
-        if not pos_escolhida: 
+        elif len(pos_escolhida) == 0: 
             pos_escolhida = self.explorar_menor_probabilidade()
 
         caminho = self.a_estrela(self.posicao_atual, pos_escolhida)
 
-        if caminho is not None:
+        if caminho is not None and len(caminho) > 0:
             for nova_pos in caminho:
 
                 self.mundo.atualizacao_matriz(self.valor_original, self.posicao_atual, nova_pos, "A")
@@ -118,7 +122,7 @@ class Agente:
 
             print("Caminho não encontrado! Vou Arriscar!")
             adjacentes_com_perigos = []
-            adjacentes_com_perigos = self.obter_posicoes_adjacentes(self.posicao_atual[0], self.posicao_atual[1])
+            adjacentes_com_perigos = self.obter_posicoes_adjacentes(self.posicao_atual[0], self.posicao_atual[1]).copy()
             adjacentes_com_perigos_copia = adjacentes_com_perigos.copy()
             
             # Escolhendo a posição com menor probabilidade de perigo nas adjacentes
@@ -131,43 +135,12 @@ class Agente:
                         menor_prob = self.probabi[x][y]
                         pos_perigo.append((x, y))
 
-
-            # percepcoes = self.mundo.matriz[self.posicao_atual[0]][self.posicao_atual[1]]
-
-            # if "F" in percepcoes:
-            #     direcao_tiro, resultado = self.atirar_flecha() #retorna true ou false para o resultado do tiro
-            #     if resultado: # Se o agente matou o wumpus
-            #         print("O agente acertou o Wumpus!")
-            #         pos_perigo.append(direcao_tiro)
-            #     else: # Se não acertou vai em uma direção contraria ao tiro!
-            #         print("O agente não acertou o Wumpus!")
-            #         pos_perigo.append(direcao_tiro)
-
-
-            # elif "B" in percepcoes:
-            #     x, y = self.posicao_atual
-            
-            #     # Decidir atirar na direção do Wumpus
-            #     for x, y in adjacentes_com_perigos:
-            #         if self.probabi[x][y] <= menor_prob:
-            #             menor_prob = self.probabi[x][y]
-            #             pos_perigo.append((x, y))
-            
-            # elif "A" in percepcoes:
-
-            #     for x, y in adjacentes_com_perigos:
-            #         if self.probabi[x][y] <= menor_prob:
-            #             menor_prob = self.probabi[x][y]
-            #             pos_perigo.append((x, y))
-
             if len(pos_perigo) == 0:
                 print("Não há posições seguras para explorar!")
                 self.mundo.imprimir_matriz(self)
                 exit()
             pos_perigo_selecionada = random.choice(pos_perigo)
 
-
-            
 
             self.mundo.atualizacao_matriz(self.valor_original, self.posicao_atual, pos_perigo_selecionada, "A")
             self.posicao_atual = pos_perigo_selecionada
@@ -177,19 +150,31 @@ class Agente:
 
 
     #Posições seguras antes de arriscar
-    def explorar_pos_seguras(self):
+    # def explorar_pos_seguras(self):
 
+    #     pos_explorar = []
+
+
+    #     for i in range (self.mundo.tamanho_linhas):
+    #         for j in range(self.mundo.tamanho_colunas):
+    #             if self.crencas[i][j] == "S" and self.memoria[i][j] != "V":
+    #                 pos_explorar.append((i, j))
+ 
+    #     return pos_explorar
+
+    def explorar_pos_seguras(self):
         pos_explorar = []
 
-        for i in range(len(self.memoria)):
-            for j in range(len(self.memoria[0])):
-                if self.memoria[i][j] == "." and self.probabi[i][j] == 0.0:
-                    pos_explorar.append((i, j))
-        
-        if len(pos_explorar) == 0:
-            return False
-        else:
-            return pos_explorar
+        for i in range(len(self.crencas)):
+            for j in range(len(self.crencas[0])):
+                if 0 <= i < len(self.crencas) and 0 <= j < len(self.crencas[0]):
+                    if self.crencas[i][j] == "S" and self.memoria[i][j] != "V":
+                        pos_explorar.append((i, j))
+                else:
+                    print(f"Índice fora dos limites: i={i}, j={j}")
+
+        return pos_explorar
+
     
     # Sem posições seguras não visitadas então explorar a menor probabilidade 
     def explorar_menor_probabilidade(self):
@@ -238,7 +223,7 @@ class Agente:
     #Matriz de estado - As crenças do agente sobre o mundo (Beliefs)
     def atualizar_crencas(self, x, y, crenca):
 
-        pos_crencas = self.obter_posicoes_adjacentes(x, y)
+        pos_crencas = self.obter_posicoes_adjacentes(x, y).copy()
         pos_crenca_copia = pos_crencas.copy() # Copia da lista de posições de crenças para iterar sobre ela
 
 
@@ -335,54 +320,150 @@ class Agente:
         return None
 
                     
+    # def obter_posicoes_adjacentes(self, x, y):
+
+    #     # Gerar uma lista de posições possíveis a partir da posição atual
+    #     adjacentes = []
+    #     for dx, dy in self.acoes:
+    #         nx, ny = x + dx, y + dy
+    #         if 0 <= nx < len(self.memoria) and 0 <= ny < len(self.memoria[0]):
+    #             adjacentes.append((nx, ny))
+    #     return adjacentes
+
     def obter_posicoes_adjacentes(self, x, y):
+        try:
+            adjacentes = []
+            for dx, dy in self.acoes:
+                nx, ny = x + dx, y + dy
+                if 0 <= nx < len(self.memoria) and 0 <= ny < len(self.memoria[0]):
+                    adjacentes.append((nx, ny))
+            return adjacentes
+        except Exception as e:
+            print(f"Erro: {e}")
+            return []
 
-        # Gerar uma lista de posições possíveis a partir da posição atual
-        adjacentes = []
-        for dx, dy in self.acoes:
-            nx, ny = x + dx, y + dy
-            if 0 <= nx < len(self.memoria) and 0 <= ny < len(self.memoria[0]):
-                adjacentes.append((nx, ny))
-        return adjacentes
 
+    def atirar_flecha(self, pos_possiveis_tiro, pos_unica_tiro):
 
-    def atirar_flecha(self):
+        pos_possiveis_tiro = pos_possiveis_tiro
+        pos_unica_tiro = pos_unica_tiro
 
-        pos_maior_acuracia = [] #Posições com maior acurácia de acertar wumpus
-        maior_prob = 0.0
-        direcao_tiro = (0, 0)
-
-        if self.flechas > 0:
-            mx, my = self.posicao_atual
-            # Verificar células adjacentes para possíveis Wumpus
-            adjacentes_tiro = self.obter_posicoes_adjacentes(mx, my) # Obter posições adjacentes
+        if pos_possiveis_tiro is not None:
             
-            # Decidir atirar na direção do Wumpus
-            for x, y in adjacentes_tiro:
-                if maior_prob <= self.probabi[x][y]:
-                    maior_prob = self.probabi[x][y]
-                    pos_maior_acuracia.append((x, y))
-            
-            direcao_tiro = random.choice(pos_maior_acuracia) # Escolher uma posição aleatória para atirar
-            mtx, mty = direcao_tiro        
-            print(f"Atirando flecha na direção: ({mtx}, {mty})")
-            self.flechas -= 1
-            # Verificar se o Wumpus foi atingido
-            if self.mundo.matriz[mtx][mty] == "0":
-                self.mundo.matriz[mtx][mty] = "!"
-            else:
-                self.mundo.matriz[mtx][mty] += "!"  # Marca a posição do tiro no mundo
+            if self.flechas > 0:
 
-            if "W" in self.mundo.matriz[mtx][mty]:
-                print("Wumpus atingido!")
-                self.mundo.ecoar_gritos_wumpus()
-                self.pontuacao.matou_wumpus()
-                self.mundo.wumpus.vivo = False
-                return direcao_tiro, True
-                             
+                # Decidir atirar na direção do Wumpus
+                direcao_tiro = random.choice(pos_possiveis_tiro) # Escolher uma posição aleatória para atirar
+                mtx, mty = direcao_tiro        
+                print(f"Atirando flecha na direção: ({mtx}, {mty})")
+                self.flechas -= 1
+                self.pontuacao.atirou_flecha()
             else:
-                print("Flecha desperdiçada.")
-                return direcao_tiro, False
+                return
+
+        elif pos_unica_tiro is not None:
+
+            if self.flechas > 0:
+
+                # Atirando na posição provável do wumpus
+                mtx, mty = pos_unica_tiro        
+                print(f"Atirando flecha na direção: ({mtx}, {mty})")
+                self.flechas -= 1
+                self.pontuacao.atirou_flecha()
+            else:
+                return
+
+        # Verificar se o Wumpus foi atingido
+        if self.mundo.matriz[mtx][mty] == "0":
+            self.mundo.matriz[mtx][mty] = "!"
         else:
-            print("Não tenho mais flechas para usar!!")
+            self.mundo.matriz[mtx][mty] += "!"  # Marca a posição do tiro no mundo
+
+        if "W" in self.mundo.matriz[mtx][mty]:
+            print("Wumpus atingido!")
+            # self.mundo.ecoar_gritos_wumpus()
+            self.pontuacao.matou_wumpus()
+            self.pontuacao.wumpus_morto()
+            self.mundo.wumpus.vivo = False
+
+
+            #Wumpus morto então essa posição agora é segura para visitar
+            self.crencas[mtx][mty] = "S"
+            self.probabi[mtx][mty] = 0.0
+
             return
+                             
+        else:
+            print("Flecha desperdiçada.")
+            return
+        
+    def hunt_wumpus(self):
+
+        pos_perigo = []
+        possiveis_possicoes_wumpus = []
+        posicao_wumpus = (0, 0)
+        adjacentes_wumpus = []
+        prob_pos_wumpus = 0.0
+        hunt_path = None
+
+        #Pega os valores das posições no caderno
+        pos_perigo = self.caderno.get_valores().copy()
+        
+        #Se o caderno está vazio não há posições com perigo
+        if len(pos_perigo) == 0: return
+        
+        #Filtro para obter as posições com perigo de Wumpus
+        for pos in pos_perigo:
+            x, y = pos
+            if self.crencas[x][y] == "W":
+                possiveis_possicoes_wumpus.append((x, y))
+        
+        # Se não há posições com perigo de Wumpus então não há necessidade de caçar o wumpus
+        if len(possiveis_possicoes_wumpus) == 0: return
+        
+        # Cenário inicial do mundo - Agente na posição (0,0) e duas posições adjacentes com perigo de Wumpus
+        if self.posicao_atual == (0,0) and len(possiveis_possicoes_wumpus)==2:
+
+            self.atirar_flecha(possiveis_possicoes_wumpus, None)
+                
+        else:
+
+            for pos in possiveis_possicoes_wumpus:
+                x, y = pos
+                if self.probabi[x][y] > prob_pos_wumpus:
+                    prob_pos_wumpus = self.probabi[x][y] # Atuliza valor da probabilidade de wumpus
+                    posicao_wumpus = (x, y) # Posicao do Wumpus com maior probabilidade
+            
+            if prob_pos_wumpus >= 0.8: #Se wumpus tem probabilidade maior que 80% de estar na posição
+                adjacentes_wumpus = self.obter_posicoes_adjacentes(posicao_wumpus[0], posicao_wumpus[1]).copy()
+                
+                for i in adjacentes_wumpus:
+                    x, y = i
+                    if self.crencas[x][y] == "S": #or self.probabi[x][y] < 0.5: #Primeiro teste sendo seguro
+                        hunt_path = self.a_estrela(self.posicao_atual, i)
+                        if hunt_path is not None:
+                            break
+                    else:
+                        continue
+            else:
+                return
+                
+            if hunt_path is not None:
+    
+                #Se o caminho para a posição adjacente do Wumpus é encontrado
+                #Então o agente caminha até a posicão
+
+                for nova_pos in hunt_path:
+                    if self.posicao_atual == nova_pos:
+                        continue
+
+                    self.mundo.atualizacao_matriz(self.valor_original, self.posicao_atual, nova_pos, "A")
+                    self.posicao_atual = nova_pos
+                    self.pontuacao.passo()
+                    self.mundo.imprimir_matriz(self)
+
+                #Atirar na direção do Wumpus
+                self.atirar_flecha(None, posicao_wumpus)
+            else:
+                print("Não é possível caçar o wumpus nesse momento!")
+                return

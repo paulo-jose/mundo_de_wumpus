@@ -8,10 +8,8 @@ class Mundo:
 
         self.tamanho_linhas = tamanho_linhas
         self.tamanho_colunas = tamanho_colunas
-        # self.posicao_agente = None
         self.wumpus = wumpus
         self.matriz = []
-        # self.posicao_ouro = None
         self.posicao_pocos = []
 
     def gerar_mundo(self):
@@ -143,4 +141,5 @@ class Mundo:
                 nova_linha.append(elemento_formatado)
             print(" ".join(nova_linha))
         print("__________________________")
+        time.sleep(1)
         os.system('clear')
