@@ -133,6 +133,6 @@ class Mundo:
                 nova_linha.append(elemento_formatado)
             print(" ".join(nova_linha))
         print("__________________________")
-        time.sleep(1)
+        time.sleep(0.1)
         os.system('clear')
      
