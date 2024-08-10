@@ -1,9 +1,11 @@
 import random
 
 class Agente:
-    def __init__(self, mundo):
+    def __init__(self, mundo, pontuacao):
         self.mundo = mundo
+        self.pontuacao = pontuacao
         self.posicao_atual = (0,0)
+        self.vivo = True
         self.valor_original = "0"
         self.ouro_encontrado = False
         self.memoria = [["." for _ in range(self.mundo.tamanho_colunas)] for _ in range(self.mundo.tamanho_linhas)] # Matriz de memória
@@ -32,6 +34,7 @@ class Agente:
 
                 self.mundo.matriz[nx][ny] = "A" #A - movido para próxima posição 
                 self.posicao_atual = (nx, ny) # Atualizando posição agente com a nova posição
+                self.pontuacao.passo()
                 self.mundo.imprimir_matriz(self)
             else:
                 # Verificando o que tem na posição atual e se é uma percepção ou end-game(W ou P)
@@ -44,6 +47,7 @@ class Agente:
                 self.mundo.matriz[nx][ny] += "A"
                 
                 self.posicao_atual = (nx, ny)
+                self.pontuacao.passo()
                 self.posicao_ouro(nx, ny)
                 self.mundo.imprimir_matriz(self)
         else:
@@ -66,7 +70,9 @@ class Agente:
     
     def verificar_objetivo(self):
         if self.ouro_encontrado and self.posicao_atual == (0, 0):
-            return True
+            self.pontuacao.pegou_ouro()
+            self.vivo = False
+            
         return False
 
     
@@ -78,13 +84,16 @@ class Agente:
 
         if "W" in self.mundo.matriz[pos_x][pos_y] and self.mundo.wumpus.esta_vivo():
             print("O agente foi devorado pelo Wumpus! Fim de jogo")
-            exit()
+            self.pontuacao.morreu_wumpus_poco()
+            self.vivo = False
         elif "W" in self.mundo.matriz[pos_x][pos_y] and not self.mundo.wumpus.esta_vivo():
-            print("O agente encontrou o Wumpus morto!") #Mensagem de teste para verificar o código!
+            print ("O agente encontrou o Wumpus morto!")
+            self.pontuacao.matou_wumpus() #Mensagem de teste para verificar o código!
             pass
         if "P" in self.mundo.matriz[pos_x][pos_y]:
             print("O agente caiu em um Poço! Fim de jogo")
-            exit()
+            self.pontuacao.morreu_wumpus_poco()
+            self.vivo = False
 
     def atirar_flecha(self):
         direcoes_f = [(0, 1), (0, -1), (1, 0), (-1, 0)]  # Lista de movimentos possíveis: Direita, Esquerda, Baixo, Cima para a flecha
@@ -95,6 +104,7 @@ class Agente:
         if 0 <= nfx < len(self.mundo.matriz) and 0 <= nfy < len(self.mundo.matriz[0]): # Verificando se a posição escolhida para a flecha vai esta dentro dos limites do mundo
             
             self.flecha = 0
+            self.pontuacao.atirou_flecha()
             # Colocar a flecha na posição selecionada aleatoriamente
             if self.mundo.matriz[nfx][nfy] == "0":
                 self.mundo.matriz[nfx][nfy] = "1"
@@ -103,6 +113,7 @@ class Agente:
 
             if "W" in self.mundo.matriz[nfx][nfy]:
                 print("O agente matou o wumpus! hehe")
+                self.pontuacao.matou_wumpus()
                 self.mundo.ecoar_gritos_wumpus() # Ecoar os gritos do wumpus pela matriz
                 self.mundo.imprimir_matriz(self) # Imprimir o mundo atualizado
                 self.mundo.wumpus.vivo = False # Wumpus morto
